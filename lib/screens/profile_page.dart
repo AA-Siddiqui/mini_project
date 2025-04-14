@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mini_project/screens/dashboard_page.dart';
+import 'package:mini_project/screens/login_page.dart';
 import 'package:provider/provider.dart';
 import '../db/database_helper.dart';
 import '../providers/user_provider.dart';
@@ -50,9 +52,25 @@ class ProfilePage extends StatelessWidget {
                     onPressed: () {
                       Provider.of<UserProvider>(context, listen: false)
                           .logout();
-                      Navigator.pop(context);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LoginPage(),
+                        ),
+                      );
                     },
                     child: Text("Logout"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DashboardPage(),
+                        ),
+                      );
+                    },
+                    child: Text("Go To Expense List"),
                   ),
                 ],
               ),

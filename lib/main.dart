@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mini_project/providers/expense_provider.dart';
 import 'package:provider/provider.dart';
 import 'providers/user_provider.dart';
 import 'screens/login_page.dart';
@@ -6,7 +7,10 @@ import 'screens/login_page.dart';
 void main() {
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => UserProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => ExpenseProvider()),
+      ],
       child: MyApp(),
     ),
   );
