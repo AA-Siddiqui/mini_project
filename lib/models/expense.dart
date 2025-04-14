@@ -6,7 +6,9 @@ class Expense {
   double amount;
   DateTime date;
   List<String> imagePaths;
-  Map<int, double> sharedWith; // userId -> percentage
+  Map<int, double> sharedWith;
+  bool isShared;
+  int? sharedByUserId;
 
   Expense({
     this.id,
@@ -17,6 +19,8 @@ class Expense {
     required this.date,
     this.imagePaths = const [],
     this.sharedWith = const {},
+    this.isShared = false,
+    this.sharedByUserId,
   });
 
   Map<String, dynamic> toMap() => {
@@ -29,6 +33,8 @@ class Expense {
         'imagePaths': imagePaths.join(','),
         'sharedWith':
             sharedWith.entries.map((e) => '${e.key}:${e.value}').join(','),
+        'isShared': isShared ? 1 : 0,
+        'sharedByUserId': sharedByUserId,
       };
 
   factory Expense.fromMap(Map<String, dynamic> map) => Expense(
@@ -44,5 +50,7 @@ class Expense {
             if (pair.contains(':'))
               int.parse(pair.split(':')[0]): double.parse(pair.split(':')[1])
         },
+        isShared: map['isShared'] == 1,
+        sharedByUserId: map['sharedByUserId'],
       );
 }
