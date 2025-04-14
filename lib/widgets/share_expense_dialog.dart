@@ -10,50 +10,81 @@ class ShareExpenseDialog extends StatefulWidget {
 }
 
 class _ShareExpenseDialogState extends State<ShareExpenseDialog> {
-  List<User> users = [];
+  List<User> allUsers = [];
   Map<int, double> shared = {};
+  User? selectedUser;
+  final _percentageController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    DatabaseHelper().getAllUsers().then((list) => setState(() => users = list));
+    DatabaseHelper()
+        .getAllUsers()
+        .then((users) => setState(() => allUsers = users));
+  }
+
+  void _addShare() {
+    if (selectedUser != null && _percentageController.text.isNotEmpty) {
+      final percent = double.tryParse(_percentageController.text);
+      if (percent != null && percent > 0) {
+        setState(() {
+          shared[selectedUser!.id!] = percent;
+        });
+        _percentageController.clear();
+        selectedUser = null;
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('Share Expense'),
-      content: SizedBox(
-        width: double.maxFinite,
-        child: ListView(
-          shrinkWrap: true,
-          children: users.map((user) {
-            return ListTile(
-              title: Text(user.username),
-              trailing: SizedBox(
-                width: 60,
-                child: TextField(
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(suffixText: '%'),
-                  onChanged: (val) {
-                    final parsed = double.tryParse(val);
-                    if (parsed != null) {
-                      shared[user.id!] = parsed;
-                    } else {
-                      shared.remove(user.id);
-                    }
-                  },
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: DropdownButtonFormField<User>(
+                  hint: Text('Select user'),
+                  value: selectedUser,
+                  items: allUsers
+                      .map((u) =>
+                          DropdownMenuItem(value: u, child: Text(u.username)))
+                      .toList(),
+                  onChanged: (user) => setState(() => selectedUser = user),
                 ),
               ),
+              SizedBox(width: 10),
+              SizedBox(
+                width: 80,
+                child: TextField(
+                  controller: _percentageController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(labelText: '%'),
+                ),
+              ),
+              IconButton(icon: Icon(Icons.add), onPressed: _addShare),
+            ],
+          ),
+          Divider(),
+          ...shared.entries.map((entry) {
+            final user = allUsers.firstWhere((u) => u.id == entry.key,
+                orElse: () => User(username: 'Unknown', password: ''));
+            return ListTile(
+              title: Text(user.username),
+              trailing: Text('${entry.value.toStringAsFixed(0)}%'),
             );
-          }).toList(),
-        ),
+          }),
+        ],
       ),
       actions: [
         TextButton(
             onPressed: () => Navigator.pop(context), child: Text('Cancel')),
         ElevatedButton(
-            onPressed: () => Navigator.pop(context, shared), child: Text('OK')),
+            onPressed: () => Navigator.pop(context, shared),
+            child: Text('Done')),
       ],
     );
   }

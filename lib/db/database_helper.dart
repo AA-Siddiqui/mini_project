@@ -18,7 +18,7 @@ class DatabaseHelper {
 
   Future<Database> _initDb() async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'app.db');
+    final path = join(dbPath, '1.db');
 
     return await openDatabase(path, version: 1, onCreate: _onCreate);
   }
@@ -35,6 +35,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE expenses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        userId INTEGER,
         name TEXT,
         category TEXT,
         amount REAL,
@@ -77,9 +78,10 @@ class DatabaseHelper {
     return await db.insert('expenses', exp.toMap());
   }
 
-  Future<List<Expense>> getAllExpenses() async {
+  Future<List<Expense>> getAllExpenses(int userId) async {
     final db = await database;
-    final res = await db.query('expenses');
+    final res =
+        await db.query('expenses', where: 'userId = ?', whereArgs: [userId]);
     return res.map((e) => Expense.fromMap(e)).toList();
   }
 

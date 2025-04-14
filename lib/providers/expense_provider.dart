@@ -4,26 +4,28 @@ import '../models/expense.dart';
 
 class ExpenseProvider extends ChangeNotifier {
   List<Expense> _expenses = [];
+  int currentUserId = -1;
 
   List<Expense> get expenses => _expenses;
 
-  Future<void> loadExpenses() async {
-    _expenses = await DatabaseHelper().getAllExpenses();
+  Future<void> loadExpenses(int userId) async {
+    currentUserId = userId;
+    _expenses = await DatabaseHelper().getAllExpenses(userId);
     notifyListeners();
   }
 
   Future<void> addExpense(Expense exp) async {
     await DatabaseHelper().insertExpense(exp);
-    await loadExpenses();
+    await loadExpenses(currentUserId);
   }
 
   Future<void> updateExpense(Expense exp) async {
     await DatabaseHelper().updateExpense(exp);
-    await loadExpenses();
+    await loadExpenses(currentUserId);
   }
 
   Future<void> deleteExpense(int id) async {
     await DatabaseHelper().deleteExpense(id);
-    await loadExpenses();
+    await loadExpenses(currentUserId);
   }
 }

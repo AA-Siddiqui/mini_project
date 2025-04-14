@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mini_project/screens/expense_detail_page.dart';
 import 'package:provider/provider.dart';
 import '../models/expense.dart';
 import '../providers/expense_provider.dart';
@@ -36,6 +37,12 @@ class ExpenseTile extends StatelessWidget {
         }
       },
       child: ListTile(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => ExpenseDetailPage(expense: expense)));
+        },
         title: Text(expense.name),
         subtitle: Text(
             '${expense.category} - \$${expense.amount.toStringAsFixed(2)}'),

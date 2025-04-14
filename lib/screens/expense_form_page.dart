@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mini_project/providers/user_provider.dart';
 import '../models/expense.dart';
 import '../providers/expense_provider.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +12,7 @@ class ExpenseFormPage extends StatefulWidget {
   const ExpenseFormPage({super.key, this.expense});
 
   @override
-  _ExpenseFormPageState createState() => _ExpenseFormPageState();
+  State<ExpenseFormPage> createState() => _ExpenseFormPageState();
 }
 
 class _ExpenseFormPageState extends State<ExpenseFormPage> {
@@ -57,6 +58,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
 
       final exp = Expense(
         id: widget.expense?.id,
+        userId: Provider.of<UserProvider>(context, listen: false).user!.id!,
         name: _name,
         category: _category,
         amount: _amount,
