@@ -64,7 +64,26 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
                 spacing: 8,
                 runSpacing: 8,
                 children: e.imagePaths
-                    .map((path) => Image.file(File(path), height: 100))
+                    .map(
+                      (path) => GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Scaffold(
+                              backgroundColor: Colors.black,
+                              appBar: AppBar(
+                                backgroundColor: Colors.black,
+                                iconTheme: IconThemeData(color: Colors.white),
+                              ),
+                              body: Center(
+                                child: Image.file(File(path)),
+                              ),
+                            ),
+                          ),
+                        ),
+                        child: Image.file(File(path), height: 100),
+                      ),
+                    )
                     .toList(),
               ),
               Divider(),

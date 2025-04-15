@@ -19,7 +19,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
   final _formKey = GlobalKey<FormState>();
   String _name = '';
   String _category = 'Food';
-  double _amount = 0;
+  double? _amount;
   DateTime _date = DateTime.now();
   List<String> _images = [];
   Map<int, double> _sharedWith = {};
@@ -61,7 +61,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
         userId: Provider.of<UserProvider>(context, listen: false).user!.id!,
         name: _name,
         category: _category,
-        amount: _amount,
+        amount: _amount ?? -1,
         date: _date,
         imagePaths: _images,
         sharedWith: _sharedWith,
