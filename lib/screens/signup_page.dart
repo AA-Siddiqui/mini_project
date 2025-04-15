@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mini_project/providers/user_provider.dart';
+import 'package:mini_project/screens/dashboard_page.dart';
+import 'package:provider/provider.dart';
 import '../db/database_helper.dart';
 import '../models/user.dart';
 
@@ -14,7 +17,17 @@ class SignupPage extends StatelessWidget {
 
     final newUser = User(username: username, password: password);
     await DatabaseHelper().insertUser(newUser);
-    Navigator.pop(context); // Back to login
+    final User? user = await DatabaseHelper().getUser(username, password);
+
+    if (user != null) {
+      Provider.of<UserProvider>(context, listen: false).login(user);
+      Navigator.popUntil(context, (route) => false);
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => DashboardPage()));
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Something went wrong!")));
+    }
   }
 
   @override
@@ -26,15 +39,18 @@ class SignupPage extends StatelessWidget {
         child: Column(
           children: [
             TextField(
-                controller: _usernameController,
-                decoration: InputDecoration(labelText: "Username")),
+              controller: _usernameController,
+              decoration: InputDecoration(labelText: "Username"),
+            ),
             TextField(
-                controller: _passwordController,
-                decoration: InputDecoration(labelText: "Password"),
-                obscureText: true),
+              controller: _passwordController,
+              decoration: InputDecoration(labelText: "Password"),
+              obscureText: true,
+            ),
             ElevatedButton(
-                onPressed: () => _signup(context),
-                child: Text("Create Account")),
+              onPressed: () => _signup(context),
+              child: Text("Create Account"),
+            ),
           ],
         ),
       ),

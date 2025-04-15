@@ -37,6 +37,13 @@ class Expense {
         'sharedByUserId': sharedByUserId,
       };
 
+  static List<String> _processImagePaths(List<String> item) {
+    if (item.length == 1 && item[0] == "") {
+      return List.empty();
+    }
+    return item;
+  }
+
   factory Expense.fromMap(Map<String, dynamic> map) => Expense(
         id: map['id'],
         userId: map['userId'],
@@ -44,7 +51,7 @@ class Expense {
         category: map['category'],
         amount: map['amount'],
         date: DateTime.parse(map['date']),
-        imagePaths: map['imagePaths'].toString().split(','),
+        imagePaths: _processImagePaths(map['imagePaths'].toString().split(',')),
         sharedWith: {
           for (var pair in map['sharedWith'].toString().split(','))
             if (pair.contains(':'))

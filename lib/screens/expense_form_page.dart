@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:mini_project/providers/user_provider.dart';
 import '../models/expense.dart';
 import '../providers/expense_provider.dart';
@@ -26,12 +27,13 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
 
   final categories = ['Food', 'Travel', 'Bills', 'Other'];
 
-  void _pickImages() async {
+  Future<bool> _pickImages() async {
     final picker = ImagePicker();
     final picked = await picker.pickMultiImage();
     setState(() {
       _images.addAll(picked.map((e) => e.path));
     });
+    return picked.isNotEmpty;
   }
 
   void _openShareDialog() async {
@@ -103,41 +105,165 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
           child: ListView(
             children: [
               TextFormField(
-                  initialValue: _name,
-                  decoration: InputDecoration(labelText: 'Name'),
-                  onSaved: (v) => _name = v!),
+                initialValue: _name,
+                decoration: InputDecoration(labelText: 'Name'),
+                onSaved: (v) => _name = v!,
+              ),
+              SizedBox(
+                height: 8,
+              ),
               DropdownButtonFormField(
-                  value: _category,
-                  items: categories
-                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                      .toList(),
-                  onChanged: (val) => _category = val!),
+                value: _category,
+                items: categories
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: (val) => _category = val!,
+              ),
+              SizedBox(
+                height: 8,
+              ),
               TextFormField(
-                  initialValue: _amount.toString(),
-                  decoration: InputDecoration(labelText: 'Amount'),
-                  keyboardType: TextInputType.number,
-                  onSaved: (v) => _amount = double.parse(v!)),
-              ListTile(
-                  title: Text('Date: ${_date.toLocal()}'.split(' ')[0]),
-                  trailing: Icon(Icons.calendar_today),
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                        context: context,
-                        initialDate: _date,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime.now());
-                    if (picked != null) setState(() => _date = picked);
-                  }),
-              ElevatedButton(onPressed: _pickImages, child: Text('Add Images')),
+                initialValue: _amount?.toString() ?? "",
+                decoration: InputDecoration(labelText: 'Amount'),
+                keyboardType: TextInputType.number,
+                onSaved: (v) => _amount = double.parse(v!),
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _date,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                  );
+                  if (picked != null) setState(() => _date = picked);
+                },
+                child: TextField(
+                  enabled: false,
+                  decoration: InputDecoration(
+                    labelText: "Date",
+                    suffix: Icon(
+                      Icons.calendar_today,
+                      size: 16,
+                    ),
+                    // IconButton(
+                    // onPressed: () async {
+                    //   final picked = await showDatePicker(
+                    //     context: context,
+                    //     initialDate: _date,
+                    //     firstDate: DateTime(2000),
+                    //     lastDate: DateTime.now(),
+                    //   );
+                    //   if (picked != null) setState(() => _date = picked);
+                    // },
+                    //   icon: Icon(Icons.calendar_today),
+                    // ),
+                  ),
+                  controller: TextEditingController(
+                    text: DateFormat('MMMM d, y').format(DateTime.parse(
+                        _date.toLocal().toString().split(' ')[0])),
+                  ),
+                ),
+              ),
+              // Container(
+              //   decoration: BoxDecoration(
+              //     color: Colors.white,
+              //     borderRadius: BorderRadius.circular(8),
+              //   ),
+              //   child: ListTile(
+              //     title: Text(
+              //       'Date: ${_date.toLocal().toString().split(' ')[0]}',
+              //     ),
+              //     trailing: Icon(Icons.calendar_today),
+              //     onTap: () async {
+              //       final picked = await showDatePicker(
+              //         context: context,
+              //         initialDate: _date,
+              //         firstDate: DateTime(2000),
+              //         lastDate: DateTime.now(),
+              //       );
+              //       if (picked != null) setState(() => _date = picked);
+              //     },
+              //   ),
+              // ),
               Wrap(
-                  children: _images
-                      .map((e) => Padding(
-                          padding: EdgeInsets.all(4),
-                          child: Image.file(File(e), height: 50)))
-                      .toList()),
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 4,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    height: 50,
+                    width: 50,
+                    child: IconButton(
+                      onPressed: _pickImages,
+                      icon: Icon(Icons.add),
+                    ),
+                  ),
+                  ..._images.indexed.map(
+                    (e) => GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) => BottomSheet(
+                            onClosing: () {},
+                            builder: (context) => Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ListTile(
+                                  leading: Icon(Icons.edit),
+                                  title: Text("Edit"),
+                                  onTap: () async {
+                                    if (await _pickImages()) {
+                                      setState(() {
+                                        _images.removeAt(e.$1);
+                                      });
+                                    }
+                                  },
+                                ),
+                                ListTile(
+                                  leading: Icon(Icons.remove),
+                                  title: Text("Remove"),
+                                  onTap: () {
+                                    setState(() {
+                                      _images.removeAt(e.$1);
+                                    });
+                                  },
+                                ),
+                                ListTile(),
+                                ListTile(),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(4),
+                        child: Container(
+                          clipBehavior: Clip.antiAlias,
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Image.file(
+                            File(e.$2),
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               ElevatedButton(
                   onPressed: _openShareDialog, child: Text('Share Expense')),
-              SizedBox(height: 20),
               ElevatedButton(onPressed: _saveExpense, child: Text('Save')),
             ],
           ),

@@ -58,7 +58,7 @@ class _ShareExpenseDialogState extends State<ShareExpenseDialog> {
               ),
               SizedBox(width: 10),
               SizedBox(
-                width: 80,
+                width: 60,
                 child: TextField(
                   controller: _percentageController,
                   keyboardType: TextInputType.number,

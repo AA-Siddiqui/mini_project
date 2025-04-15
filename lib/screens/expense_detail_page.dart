@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/expense.dart';
 import '../db/database_helper.dart';
 import '../models/user.dart';
@@ -31,79 +32,142 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
   @override
   Widget build(BuildContext context) {
     final e = widget.expense;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Expense Details')),
+      appBar: AppBar(
+        title: Text('Expense Details'),
+        centerTitle: true,
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(
           children: [
-            ListTile(
-              title: Text('Name'),
-              subtitle: Text(e.name),
-            ),
-            ListTile(
-              title: Text('Category'),
-              subtitle: Text(e.category),
-            ),
-            ListTile(
-              title: Text('Amount'),
-              subtitle: Text('\$${e.amount.toStringAsFixed(2)}'),
-            ),
-            ListTile(
-              title: Text('Date'),
-              subtitle: Text('${e.date.toLocal()}'.split(' ')[0]),
-            ),
+            _buildInfoCard('Name', e.name, theme),
+            _buildInfoCard('Category', e.category, theme),
+            _buildInfoCard('Amount', '\$${e.amount.toStringAsFixed(2)}', theme),
+            _buildInfoCard(
+                'Date',
+                DateFormat('MMMM d, y').format(
+                    DateTime.parse('${e.date.toLocal()}'.split(' ')[0])),
+                theme),
             if (e.imagePaths.isNotEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Text('Images',
-                    style: Theme.of(context).textTheme.titleMedium),
-              ),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: e.imagePaths
-                    .map(
-                      (path) => GestureDetector(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Scaffold(
-                              backgroundColor: Colors.black,
-                              appBar: AppBar(
-                                backgroundColor: Colors.black,
-                                iconTheme: IconThemeData(color: Colors.white),
-                              ),
-                              body: Center(
-                                child: Image.file(File(path)),
-                              ),
-                            ),
-                          ),
-                        ),
-                        child: Image.file(File(path), height: 100),
+              Card(
+                elevation: 1,
+                color: theme.colorScheme.secondaryContainer,
+                margin: const EdgeInsets.symmetric(vertical: 2),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Receipts",
+                        style: theme.textTheme.labelLarge,
                       ),
-                    )
-                    .toList(),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: e.imagePaths
+                            .map(
+                              (path) => GestureDetector(
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => Scaffold(
+                                      backgroundColor: Colors.black,
+                                      appBar: AppBar(
+                                        backgroundColor: Colors.black,
+                                        iconTheme:
+                                            IconThemeData(color: Colors.white),
+                                      ),
+                                      body:
+                                          Center(child: Image.file(File(path))),
+                                    ),
+                                  ),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(File(path),
+                                      height: 100,
+                                      width: 100,
+                                      fit: BoxFit.cover),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              Divider(),
             ],
             if (e.sharedWith.isNotEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Text('Shared With',
-                    style: Theme.of(context).textTheme.titleMedium),
+              Card(
+                elevation: 1,
+                color: theme.colorScheme.secondaryContainer,
+                margin: const EdgeInsets.symmetric(vertical: 2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        "Shared With",
+                        style: theme.textTheme.labelLarge,
+                      ),
+                      DataTable(
+                        columns: [
+                          DataColumn(label: Text("Person")),
+                          DataColumn(label: Text("%age")),
+                        ],
+                        rows: e.sharedWith.entries
+                            .map(
+                              (item) => DataRow(
+                                cells: [
+                                  DataCell(
+                                      Text(userIdToName[item.key] ?? "Person")),
+                                  DataCell(Text(
+                                      '${item.value.toStringAsFixed(0)}%')),
+                                ],
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              ...e.sharedWith.entries.map((entry) {
-                final name = userIdToName[entry.key] ?? 'User ${entry.key}';
-                return ListTile(
-                  title: Text(name),
-                  trailing: Text('${entry.value.toStringAsFixed(0)}%'),
-                );
-              })
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoCard(String title, String value, ThemeData theme) {
+    return Card(
+      elevation: 1,
+      color: theme.colorScheme.secondaryContainer,
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: ListTile(
+        title: Text(title, style: theme.textTheme.labelLarge),
+        subtitle: Text(value, style: theme.textTheme.bodyMedium),
       ),
     );
   }
