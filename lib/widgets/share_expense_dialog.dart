@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mini_project/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 import '../db/database_helper.dart';
 import '../models/user.dart';
 
@@ -50,6 +52,10 @@ class _ShareExpenseDialogState extends State<ShareExpenseDialog> {
                   hint: Text('Select user'),
                   value: selectedUser,
                   items: allUsers
+                      .where((user) =>
+                          user.username !=
+                          (Provider.of<UserProvider>(context).user?.username ??
+                              ""))
                       .map((u) =>
                           DropdownMenuItem(value: u, child: Text(u.username)))
                       .toList(),
@@ -69,6 +75,11 @@ class _ShareExpenseDialogState extends State<ShareExpenseDialog> {
             ],
           ),
           Divider(),
+          ListTile(
+            title: Text("You"),
+            trailing: Text(
+                '${(100 - shared.entries.fold(0.0, (prev, n) => prev + n.value)).toStringAsFixed(0)}%'),
+          ),
           ...shared.entries.map((entry) {
             final user = allUsers.firstWhere((u) => u.id == entry.key,
                 orElse: () => User(username: 'Unknown', password: ''));
@@ -81,10 +92,13 @@ class _ShareExpenseDialogState extends State<ShareExpenseDialog> {
       ),
       actions: [
         TextButton(
-            onPressed: () => Navigator.pop(context), child: Text('Cancel')),
+          onPressed: () => Navigator.pop(context),
+          child: Text('Cancel'),
+        ),
         ElevatedButton(
-            onPressed: () => Navigator.pop(context, shared),
-            child: Text('Done')),
+          onPressed: () => Navigator.pop(context, shared),
+          child: Text('Done'),
+        ),
       ],
     );
   }

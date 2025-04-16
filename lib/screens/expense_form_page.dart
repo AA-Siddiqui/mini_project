@@ -48,9 +48,10 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
     if (result != null) {
       final total = result.values.fold(0.0, (sum, val) => sum + val);
       if (total != 100.0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Percentages must add up to 100')));
-        return;
+        result.addAll({
+          Provider.of<UserProvider>(context, listen: false).user?.id ?? -1:
+              100 - total
+        });
       }
       setState(() {
         _sharedWith = result;
@@ -186,12 +187,18 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                             ListTile(
                               title: Text("Camera"),
                               leading: Icon(Icons.camera),
-                              onTap: () => _pickImages(true),
+                              onTap: () {
+                                _pickImages(true);
+                                Navigator.pop(context);
+                              },
                             ),
                             ListTile(
                               title: Text("Gallery"),
                               leading: Icon(Icons.image),
-                              onTap: _pickImages,
+                              onTap: () {
+                                _pickImages();
+                                Navigator.pop(context);
+                              },
                             ),
                             ListTile(),
                             ListTile(),
