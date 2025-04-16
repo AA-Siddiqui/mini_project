@@ -75,7 +75,7 @@ class DatabaseHelper {
     await db.delete('users', where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<int> insertExpense(Expense expense) async {
+  Future<void> insertExpense(Expense expense) async {
     final db = await database;
 
 // Now create individual entries for sharedWith users
@@ -83,23 +83,24 @@ class DatabaseHelper {
       final userId = entry.key;
       final percentage = entry.value;
 
-      if (userId != expense.userId) {
-        final sharedExpense = Expense(
-          userId: userId,
-          name: expense.name,
-          category: expense.category,
-          amount: expense.amount * (percentage / 100),
-          date: expense.date,
-          imagePaths: expense.imagePaths,
-          isShared: true,
-          sharedByUserId: expense.userId,
-        );
+      // if (userId != expense.userId) {
+      final sharedExpense = Expense(
+        userId: userId,
+        name: expense.name,
+        category: expense.category,
+        amount: expense.amount * (percentage / 100),
+        date: expense.date,
+        imagePaths: expense.imagePaths,
+        isShared: true,
+        sharedByUserId: expense.userId,
+        sharedWith: expense.sharedWith,
+      );
 
-        await db.insert('expenses', sharedExpense.toMap());
-      }
+      await db.insert('expenses', sharedExpense.toMap());
+      // }
     }
 
-    return await db.insert('expenses', expense.toMap());
+    // return await db.insert('expenses', expense.toMap());
   }
 
   Future<List<Expense>> getAllExpenses(int userId) async {

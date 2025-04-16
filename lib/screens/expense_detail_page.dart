@@ -91,17 +91,28 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
                                         iconTheme:
                                             IconThemeData(color: Colors.white),
                                       ),
-                                      body:
-                                          Center(child: Image.file(File(path))),
+                                      body: Center(
+                                        child: Hero(
+                                          tag: path,
+                                          child: Image.file(
+                                            File(path),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
-                                  child: Image.file(File(path),
+                                  child: Hero(
+                                    tag: path,
+                                    child: Image.file(
+                                      File(path),
                                       height: 100,
                                       width: 100,
-                                      fit: BoxFit.cover),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
                                 ),
                               ),
                             )

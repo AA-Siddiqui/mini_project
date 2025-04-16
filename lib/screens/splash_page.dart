@@ -29,13 +29,7 @@ class _SplashPageState extends State<SplashPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset("assets/logo.png"),
-            Text("Expense Locator"),
-          ],
-        ),
+        child: Image.asset("assets/logo.png"),
       ),
     );
   }

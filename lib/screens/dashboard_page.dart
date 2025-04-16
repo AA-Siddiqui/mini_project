@@ -37,9 +37,107 @@ class DashboardPage extends StatelessWidget {
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,
         elevation: 1,
+        actions: [
+          IconButton(
+            onPressed: Provider.of<UserProvider>(context).logout,
+            icon: Icon(Icons.logout),
+          ),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 24,
+                  children: [
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.notifications,
+                          size: 22,
+                          color: theme.colorScheme.primary,
+                        ),
+                        Text(
+                          "Reminders",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w200,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.article,
+                          size: 22,
+                        ),
+                        Text(
+                          "Receipts",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w200,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 24,
+                  children: [
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.image,
+                          size: 22,
+                        ),
+                        Text(
+                          "Statistics",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w200,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.home,
+                          size: 22,
+                        ),
+                        Text(
+                          "Home",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w200,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: FutureBuilder(
-        future: provider.loadExpenses(user!.id!),
+        future: provider.loadExpenses(user?.id! ?? -1),
         builder: (context, snapshot) {
           if (provider.expenses.isEmpty) {
             return Center(
@@ -59,37 +157,44 @@ class DashboardPage extends StatelessWidget {
                   horizontal: 36,
                 ),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   spacing: 16,
                   children: [
                     GestureDetector(
                       onTap: () => _pickImage(context),
                       child: CircleAvatar(
                         radius: 40,
-                        backgroundImage: user.avatarPath != null
-                            ? FileImage(File(user.avatarPath!))
+                        backgroundImage: user?.avatarPath != null
+                            ? FileImage(
+                                File(user!.avatarPath!),
+                              )
                             : null,
-                        child: user.avatarPath == null
-                            ? Icon(Icons.person, size: 40)
+                        child: user?.avatarPath == null
+                            ? Icon(
+                                Icons.person,
+                                size: 40,
+                              )
                             : null,
                       ),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Hello,",
+                        Text.rich(
+                          TextSpan(text: "Hello,", children: [
+                            TextSpan(
+                              text: "${user?.username ?? "User"}!",
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ]),
                           style: TextStyle(
                             fontSize: 22,
                           ),
                         ),
-                        Text(
-                          user.username,
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        Text("Welcome to Expense Locator"),
                       ],
                     ),
                   ],
@@ -132,6 +237,7 @@ class DashboardPage extends StatelessWidget {
           context,
           MaterialPageRoute(builder: (_) => ExpenseFormPage()),
         ),
+        shape: CircleBorder(),
         backgroundColor: theme.colorScheme.secondary,
         child: Icon(Icons.add, color: theme.colorScheme.onSecondary),
       ),

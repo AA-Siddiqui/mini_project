@@ -34,31 +34,40 @@ class LoginPage extends StatelessWidget {
       appBar: AppBar(title: Text("Login")),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(labelText: "Username"),
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: "Password"),
-              obscureText: true,
-            ),
-            ElevatedButton(
-              onPressed: () => _login(context),
-              child: Text("Login"),
-            ),
-            TextButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => SignupPage(),
-                ),
+        child: Center(
+          child: Column(
+            spacing: 16,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Image.asset(
+                'assets/logo.png',
+                height: 100,
               ),
-              child: Text("Sign Up"),
-            ),
-          ],
+              TextField(
+                controller: _usernameController,
+                decoration: InputDecoration(labelText: "Username"),
+              ),
+              TextField(
+                controller: _passwordController,
+                decoration: InputDecoration(labelText: "Password"),
+                obscureText: true,
+              ),
+              ElevatedButton(
+                onPressed: () => _login(context),
+                child: Text("Login"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => SignupPage(),
+                  ),
+                ),
+                child: Text("Don't have an accout? Sign Up"),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -9,8 +9,12 @@ class ExpenseProvider extends ChangeNotifier {
   List<Expense> get expenses => _expenses;
 
   Future<void> loadExpenses(int userId) async {
-    currentUserId = userId;
-    _expenses = await DatabaseHelper().getAllExpenses(userId);
+    if (userId == -1) {
+      _expenses.clear();
+    } else {
+      currentUserId = userId;
+      _expenses = await DatabaseHelper().getAllExpenses(userId);
+    }
     notifyListeners();
   }
 

@@ -27,9 +27,13 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
 
   final categories = ['Food', 'Travel', 'Bills', 'Other'];
 
-  Future<bool> _pickImages() async {
+  Future<bool> _pickImages([bool select = false]) async {
     final picker = ImagePicker();
-    final picked = await picker.pickMultiImage();
+    final picked = !select
+        ? await picker.pickMultiImage()
+        : [await picker.pickImage(source: ImageSource.camera)]
+            .whereType<XFile>()
+            .toList();
     setState(() {
       _images.addAll(picked.map((e) => e.path));
     });
@@ -149,46 +153,19 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                       Icons.calendar_today,
                       size: 16,
                     ),
-                    // IconButton(
-                    // onPressed: () async {
-                    //   final picked = await showDatePicker(
-                    //     context: context,
-                    //     initialDate: _date,
-                    //     firstDate: DateTime(2000),
-                    //     lastDate: DateTime.now(),
-                    //   );
-                    //   if (picked != null) setState(() => _date = picked);
-                    // },
-                    //   icon: Icon(Icons.calendar_today),
-                    // ),
                   ),
                   controller: TextEditingController(
-                    text: DateFormat('MMMM d, y').format(DateTime.parse(
-                        _date.toLocal().toString().split(' ')[0])),
+                    text: DateFormat('MMMM d, y').format(
+                      DateTime.parse(
+                        _date.toLocal().toString().split(' ')[0],
+                      ),
+                    ),
                   ),
                 ),
               ),
-              // Container(
-              //   decoration: BoxDecoration(
-              //     color: Colors.white,
-              //     borderRadius: BorderRadius.circular(8),
-              //   ),
-              //   child: ListTile(
-              //     title: Text(
-              //       'Date: ${_date.toLocal().toString().split(' ')[0]}',
-              //     ),
-              //     trailing: Icon(Icons.calendar_today),
-              //     onTap: () async {
-              //       final picked = await showDatePicker(
-              //         context: context,
-              //         initialDate: _date,
-              //         firstDate: DateTime(2000),
-              //         lastDate: DateTime.now(),
-              //       );
-              //       if (picked != null) setState(() => _date = picked);
-              //     },
-              //   ),
-              // ),
+              SizedBox(
+                height: 8,
+              ),
               Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 spacing: 4,
@@ -201,7 +178,26 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                     height: 50,
                     width: 50,
                     child: IconButton(
-                      onPressed: _pickImages,
+                      onPressed: () => showModalBottomSheet(
+                        context: context,
+                        builder: (context) => Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              title: Text("Camera"),
+                              leading: Icon(Icons.camera),
+                              onTap: () => _pickImages(true),
+                            ),
+                            ListTile(
+                              title: Text("Gallery"),
+                              leading: Icon(Icons.image),
+                              onTap: _pickImages,
+                            ),
+                            ListTile(),
+                            ListTile(),
+                          ],
+                        ),
+                      ),
                       icon: Icon(Icons.add),
                     ),
                   ),
@@ -262,9 +258,20 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                   ),
                 ],
               ),
+              SizedBox(
+                height: 8,
+              ),
               ElevatedButton(
-                  onPressed: _openShareDialog, child: Text('Share Expense')),
-              ElevatedButton(onPressed: _saveExpense, child: Text('Save')),
+                onPressed: _openShareDialog,
+                child: Text('Share Expense'),
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              ElevatedButton(
+                onPressed: _saveExpense,
+                child: Text('Save'),
+              ),
             ],
           ),
         ),

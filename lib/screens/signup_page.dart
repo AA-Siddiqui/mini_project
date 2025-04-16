@@ -36,22 +36,31 @@ class SignupPage extends StatelessWidget {
       appBar: AppBar(title: Text("Sign Up")),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(labelText: "Username"),
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: "Password"),
-              obscureText: true,
-            ),
-            ElevatedButton(
-              onPressed: () => _signup(context),
-              child: Text("Create Account"),
-            ),
-          ],
+        child: Center(
+          child: Column(
+            spacing: 16,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Image.asset(
+                'assets/logo.png',
+                height: 100,
+              ),
+              TextField(
+                controller: _usernameController,
+                decoration: InputDecoration(labelText: "Username"),
+              ),
+              TextField(
+                controller: _passwordController,
+                decoration: InputDecoration(labelText: "Password"),
+                obscureText: true,
+              ),
+              ElevatedButton(
+                onPressed: () => _signup(context),
+                child: Text("Create Account"),
+              ),
+            ],
+          ),
         ),
       ),
     );
